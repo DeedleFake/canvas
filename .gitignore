@@ -1,2 +1,4 @@
 *.html
 *.js
+*.js.map
+*.swp
