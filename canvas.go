@@ -28,37 +28,37 @@ func New(elem *js.Object) *Canvas {
 	}
 }
 
-func (c *Canvas) ClearRect(r image.Rectangle) {
+func (c *Canvas) Rect(r image.Rectangle) Object {
+	r = r.Canon()
+
+	p := func(pb *PathBuilder) {
+		pb.Rect(r)
+	}
+
+	return &pathObj{
+		c:    c,
+		path: p,
+	}
+}
+
+func (c *Canvas) Path(p func(*PathBuilder)) Object {
+	return &pathObj{
+		c:    c,
+		path: p,
+	}
+}
+
+func (c *Canvas) Text(text string, mw int) Object {
+	return &textObj{
+		c:    c,
+		text: text,
+		mw:   mw,
+	}
+}
+
+func (c *Canvas) Clear(r image.Rectangle) {
 	r = r.Canon()
 	c.ctx.Call("clearRect", r.Min.X, r.Min.Y, r.Dx(), r.Dy())
-}
-
-func (c *Canvas) FillRect(r image.Rectangle) {
-	r = r.Canon()
-	c.ctx.Call("fillRect", r.Min.X, r.Min.Y, r.Dx(), r.Dy())
-}
-
-func (c *Canvas) StrokeRect(r image.Rectangle) {
-	r = r.Canon()
-	c.ctx.Call("strokeRect", r.Min.X, r.Min.Y, r.Dx(), r.Dy())
-}
-
-func (c *Canvas) FillText(text string, p image.Point, mw int) {
-	if mw < 0 {
-		c.ctx.Call("fillText", text, p.X, p.Y)
-		return
-	}
-
-	c.ctx.Call("fillText", text, p.X, p.Y, mw)
-}
-
-func (c *Canvas) StrokeText(text string, p image.Point, mw int) {
-	if mw < 0 {
-		c.ctx.Call("strokeText", text, p.X, p.Y)
-		return
-	}
-
-	c.ctx.Call("strokeText", text, p.X, p.Y, mw)
 }
 
 func (c *Canvas) MeasureText(text string) (tm TextMetrics) {
