@@ -3,11 +3,14 @@ package canvas
 type Object interface {
 	Stroke(Point)
 	Fill(Point)
+
+	SetLineStyle(*LineStyle)
 }
 
 type pathObj struct {
 	c    *Canvas
 	path func(*PathBuilder)
+	ls   *LineStyle
 }
 
 func (p pathObj) Fill(pt Point) {
@@ -16,6 +19,7 @@ func (p pathObj) Fill(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
+	defer p.ls.set(p.c).set(p.c)
 	p.c.ctx.Call("fill")
 }
 
@@ -25,7 +29,12 @@ func (p pathObj) Stroke(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
+	defer p.ls.set(p.c).set(p.c)
 	p.c.ctx.Call("stroke")
+}
+
+func (p pathObj) SetLineStyle(ls *LineStyle) {
+	p.ls = ls
 }
 
 type PathBuilder struct {
@@ -103,4 +112,7 @@ func (t textObj) Stroke(p Point) {
 	}
 
 	t.c.ctx.Call("strokeText", t.text, p.X, p.Y, t.mw)
+}
+
+func (t textObj) SetLineStyle(*LineStyle) {
 }
