@@ -1,9 +1,9 @@
 package canvas
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gopherjs/gopherjs/js"
-	"image"
 	"image/color"
 )
 
@@ -21,14 +21,18 @@ type Canvas struct {
 	ctx  *js.Object
 }
 
-func New(elem *js.Object) *Canvas {
+func New(elem *js.Object) (*Canvas, error) {
+	if js.Global.Get("CanvasRenderingContext2D") == nil {
+		return nil, errors.New("Browser doesn't support canvas 2D")
+	}
+
 	return &Canvas{
 		elem: elem,
 		ctx:  elem.Call("getContext", "2d"),
-	}
+	}, nil
 }
 
-func (c *Canvas) Rect(r image.Rectangle) Object {
+func (c *Canvas) Rect(r Rectangle) Object {
 	r = r.Canon()
 
 	p := func(pb *PathBuilder) {
@@ -48,7 +52,7 @@ func (c *Canvas) Path(p func(*PathBuilder)) Object {
 	}
 }
 
-func (c *Canvas) Text(text string, mw int) Object {
+func (c *Canvas) Text(text string, mw float64) Object {
 	return &textObj{
 		c:    c,
 		text: text,
@@ -56,7 +60,7 @@ func (c *Canvas) Text(text string, mw int) Object {
 	}
 }
 
-func (c *Canvas) Clear(r image.Rectangle) {
+func (c *Canvas) Clear(r Rectangle) {
 	r = r.Canon()
 	c.ctx.Call("clearRect", r.Min.X, r.Min.Y, r.Dx(), r.Dy())
 }
@@ -135,12 +139,12 @@ func (c *Canvas) LineDash(pattern []float64) []float64 {
 	return pattern
 }
 
-func (c *Canvas) Width() int {
-	return c.elem.Get("width").Int()
+func (c *Canvas) Width() float64 {
+	return c.elem.Get("width").Float()
 }
 
-func (c *Canvas) Height() int {
-	return c.elem.Get("height").Int()
+func (c *Canvas) Height() float64 {
+	return c.elem.Get("height").Float()
 }
 
 type Font struct {

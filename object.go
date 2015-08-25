@@ -1,12 +1,8 @@
 package canvas
 
-import (
-	"image"
-)
-
 type Object interface {
-	Stroke(image.Point)
-	Fill(image.Point)
+	Stroke(Point)
+	Fill(Point)
 }
 
 type pathObj struct {
@@ -14,7 +10,7 @@ type pathObj struct {
 	path func(*PathBuilder)
 }
 
-func (p pathObj) Fill(pt image.Point) {
+func (p pathObj) Fill(pt Point) {
 	pb := &PathBuilder{p.c}
 
 	pb.begin(pt)
@@ -23,7 +19,7 @@ func (p pathObj) Fill(pt image.Point) {
 	p.c.ctx.Call("fill")
 }
 
-func (p pathObj) Stroke(pt image.Point) {
+func (p pathObj) Stroke(pt Point) {
 	pb := &PathBuilder{p.c}
 
 	pb.begin(pt)
@@ -36,25 +32,25 @@ type PathBuilder struct {
 	c *Canvas
 }
 
-func (pb *PathBuilder) begin(p image.Point) {
+func (pb *PathBuilder) begin(p Point) {
 	pb.c.ctx.Call("beginPath")
 	pb.c.ctx.Call("moveTo", p.X, p.Y)
 }
 
-func (pb PathBuilder) Rect(r image.Rectangle) {
+func (pb PathBuilder) Rect(r Rectangle) {
 	r = r.Canon()
 	pb.c.ctx.Call("rect", r.Min.X, r.Min.Y, r.Dx(), r.Dy())
 }
 
-func (pb PathBuilder) MoveTo(p image.Point) {
+func (pb PathBuilder) MoveTo(p Point) {
 	pb.c.ctx.Call("moveTo", p.X, p.Y)
 }
 
-func (pb PathBuilder) Line(p image.Point) {
+func (pb PathBuilder) Line(p Point) {
 	pb.c.ctx.Call("lineTo", p.X, p.Y)
 }
 
-func (pb PathBuilder) Bezier(cp1, cp2, end image.Point) {
+func (pb PathBuilder) Bezier(cp1, cp2, end Point) {
 	pb.c.ctx.Call("bezierCurveTo",
 		cp1.X,
 		cp1.Y,
@@ -65,7 +61,7 @@ func (pb PathBuilder) Bezier(cp1, cp2, end image.Point) {
 	)
 }
 
-func (pb PathBuilder) Quadratic(cp, end image.Point) {
+func (pb PathBuilder) Quadratic(cp, end Point) {
 	pb.c.ctx.Call("quadraticCurveTo",
 		cp.X,
 		cp.Y,
@@ -74,7 +70,7 @@ func (pb PathBuilder) Quadratic(cp, end image.Point) {
 	)
 }
 
-func (pb PathBuilder) Arc(c image.Point, r float64, sa, ea float64, cc bool) {
+func (pb PathBuilder) Arc(c Point, r float64, sa, ea float64, cc bool) {
 	pb.c.ctx.Call("arc",
 		c.X,
 		c.Y,
@@ -88,10 +84,10 @@ func (pb PathBuilder) Arc(c image.Point, r float64, sa, ea float64, cc bool) {
 type textObj struct {
 	c    *Canvas
 	text string
-	mw   int
+	mw   float64
 }
 
-func (t textObj) Fill(p image.Point) {
+func (t textObj) Fill(p Point) {
 	if t.mw < 0 {
 		t.c.ctx.Call("fillText", t.text, p.X, p.Y)
 		return
@@ -100,7 +96,7 @@ func (t textObj) Fill(p image.Point) {
 	t.c.ctx.Call("fillText", t.text, p.X, p.Y, t.mw)
 }
 
-func (t textObj) Stroke(p image.Point) {
+func (t textObj) Stroke(p Point) {
 	if t.mw < 0 {
 		t.c.ctx.Call("strokeText", t.text, p.X, p.Y)
 		return
