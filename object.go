@@ -7,10 +7,19 @@ type Object interface {
 	SetLineStyle(*LineStyle)
 }
 
+type commonStyle struct {
+	ls *LineStyle
+}
+
+func (s *commonStyle) SetLineStyle(ls *LineStyle) {
+	s.ls = ls
+}
+
 type pathObj struct {
 	c    *Canvas
 	path func(*PathBuilder)
-	ls   *LineStyle
+
+	commonStyle
 }
 
 func (p pathObj) Fill(pt Point) {
@@ -31,10 +40,6 @@ func (p pathObj) Stroke(pt Point) {
 
 	defer p.ls.set(p.c).set(p.c)
 	p.c.ctx.Call("stroke")
-}
-
-func (p pathObj) SetLineStyle(ls *LineStyle) {
-	p.ls = ls
 }
 
 type PathBuilder struct {
@@ -94,6 +99,8 @@ type textObj struct {
 	c    *Canvas
 	text string
 	mw   float64
+
+	commonStyle
 }
 
 func (t textObj) Fill(p Point) {
@@ -112,7 +119,4 @@ func (t textObj) Stroke(p Point) {
 	}
 
 	t.c.ctx.Call("strokeText", t.text, p.X, p.Y, t.mw)
-}
-
-func (t textObj) SetLineStyle(*LineStyle) {
 }
