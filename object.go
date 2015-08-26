@@ -15,6 +15,14 @@ func (s *commonStyle) SetLineStyle(ls *LineStyle) {
 	s.ls = ls
 }
 
+func (s *commonStyle) set(c *Canvas) func() {
+	lsOld := s.ls.set(c)
+
+	return func() {
+		lsOld.set(c)
+	}
+}
+
 type pathObj struct {
 	c    *Canvas
 	path func(*PathBuilder)
@@ -28,7 +36,7 @@ func (p pathObj) Fill(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
-	defer p.ls.set(p.c).set(p.c)
+	defer p.set(p.c)()
 	p.c.ctx.Call("fill")
 }
 
@@ -38,7 +46,7 @@ func (p pathObj) Stroke(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
-	defer p.ls.set(p.c).set(p.c)
+	defer p.set(p.c)()
 	p.c.ctx.Call("stroke")
 }
 
