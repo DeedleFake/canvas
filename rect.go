@@ -1,5 +1,7 @@
 package canvas
 
+// Rectangle represents a rectangle. It is patterned after
+// image.Rectangle, but is float64 based.
 type Rectangle struct {
 	Min, Max Point
 }
@@ -30,6 +32,8 @@ func (r Rectangle) Dy() float64 {
 	return r.Max.Y - r.Min.Y
 }
 
+// Point represents a point on the cartesian plane. It is patterned
+// after image.Point, but is float64 based.
 type Point struct {
 	X, Y float64
 }
