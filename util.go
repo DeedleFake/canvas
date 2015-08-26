@@ -5,7 +5,7 @@ import (
 )
 
 func getFloats(obj *js.Object) (ret []float64) {
-	if (obj == nil) || (obj.Length() == 0) {
+	if (obj == js.Undefined) || (obj == nil) || (obj.Length() == 0) {
 		return nil
 	}
 
