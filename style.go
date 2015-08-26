@@ -4,34 +4,40 @@ import (
 	"fmt"
 )
 
-type LineStyle struct {
-	LineWidth  float64
-	LineCap    LineCap
-	LineJoin   LineJoin
-	MiterLimit float64
-	LineDash   []float64
+type style struct {
+	lineWidth  float64
+	lineCap    LineCap
+	lineJoin   LineJoin
+	miterLimit float64
+	lineDash   []float64
 }
 
-func (ls *LineStyle) set(c *Canvas) *LineStyle {
-	if ls == nil {
-		return nil
-	}
+func (s *style) set(c *Canvas) {
+	c.ctx.Set("lineWidth", s.lineWidth)
+	c.ctx.Set("lineCap", s.lineCap.String())
+	c.ctx.Set("lineJoin", s.lineJoin.String())
+	c.ctx.Set("miterLimit", s.miterLimit)
+	c.ctx.Set("lineDash", s.lineDash)
+}
 
-	r := &LineStyle{
-		LineWidth:  c.ctx.Get("lineWidth").Float(),
-		LineCap:    parseLineCap(c.ctx.Get("lineCap").String()),
-		LineJoin:   parseLineJoin(c.ctx.Get("lineJoin").String()),
-		MiterLimit: c.ctx.Get("miterLimit").Float(),
-		LineDash:   getFloats(c.ctx.Get("lineDash")),
-	}
+func (s *style) SetLineWidth(width float64) {
+	s.lineWidth = width
+}
 
-	c.ctx.Set("lineWidth", ls.LineWidth)
-	c.ctx.Set("lineCap", ls.LineCap.String())
-	c.ctx.Set("lineJoin", ls.LineJoin.String())
-	c.ctx.Set("miterLimit", ls.MiterLimit)
-	c.ctx.Set("lineDash", ls.LineDash)
+func (s *style) SetLineCap(lc LineCap) {
+	s.lineCap = lc
+}
 
-	return r
+func (s *style) SetLineJoin(join LineJoin) {
+	s.lineJoin = join
+}
+
+func (s *style) SetMiterLimit(limit float64) {
+	s.miterLimit = limit
+}
+
+func (s *style) SetLineDash(dash []float64) {
+	s.lineDash = dash
 }
 
 type LineCap int

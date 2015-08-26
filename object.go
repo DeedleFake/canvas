@@ -4,30 +4,18 @@ type Object interface {
 	Stroke(Point)
 	Fill(Point)
 
-	SetLineStyle(*LineStyle)
-}
-
-type commonStyle struct {
-	ls *LineStyle
-}
-
-func (s *commonStyle) SetLineStyle(ls *LineStyle) {
-	s.ls = ls
-}
-
-func (s *commonStyle) set(c *Canvas) func() {
-	lsOld := s.ls.set(c)
-
-	return func() {
-		lsOld.set(c)
-	}
+	SetLineWidth(float64)
+	SetLineCap(LineCap)
+	SetLineJoin(LineJoin)
+	SetMiterLimit(float64)
+	SetLineDash([]float64)
 }
 
 type pathObj struct {
 	c    *Canvas
 	path func(*PathBuilder)
 
-	commonStyle
+	style
 }
 
 func (p pathObj) Fill(pt Point) {
@@ -36,7 +24,7 @@ func (p pathObj) Fill(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
-	defer p.set(p.c)()
+	p.set(p.c)
 	p.c.ctx.Call("fill")
 }
 
@@ -46,7 +34,7 @@ func (p pathObj) Stroke(pt Point) {
 	pb.begin(pt)
 	p.path(pb)
 
-	defer p.set(p.c)()
+	p.set(p.c)
 	p.c.ctx.Call("stroke")
 }
 
@@ -108,7 +96,7 @@ type textObj struct {
 	text string
 	mw   float64
 
-	commonStyle
+	style
 }
 
 func (t textObj) Fill(p Point) {
