@@ -1,3 +1,5 @@
+// +build wasm
+
 package canvas
 
 // Rectangle represents a rectangle. It is patterned after

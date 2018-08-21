@@ -1,3 +1,5 @@
+// +build wasm
+
 package canvas
 
 // Object represents an object that can be drawn on the canvas.

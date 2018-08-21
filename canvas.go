@@ -1,10 +1,12 @@
+// +build wasm
+
 package canvas
 
 import (
 	"errors"
 	"fmt"
-	"github.com/gopherjs/gopherjs/js"
 	"image/color"
+	"syscall/js"
 )
 
 func hexColor(c color.Color) string {
@@ -19,8 +21,8 @@ func hexColor(c color.Color) string {
 // Canvas represents an HTML <canvas> element and its associated 2D
 // rendering context.
 type Canvas struct {
-	elem *js.Object
-	ctx  *js.Object
+	elem js.Value
+	ctx  js.Value
 }
 
 // New returns a new Canvas that wraps the <canvas> elem. This will
@@ -30,8 +32,11 @@ type Canvas struct {
 //
 // If the browser doesn't support CanvasRenderingContext2D, an error
 // is returned.
-func New(elem *js.Object) (*Canvas, error) {
-	if js.Global.Get("CanvasRenderingContext2D") == nil {
+func New(elem js.Value) (*Canvas, error) {
+	if js.Global().Get("CanvasRenderingContext2D") == js.Undefined() {
+		// TODO: Is this necessary? I would think that anything that
+		// supports WebAssembly should probably also have support for
+		// canvases. Maybe Node.js?
 		return nil, errors.New("Browser doesn't support canvas 2D")
 	}
 

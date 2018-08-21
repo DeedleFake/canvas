@@ -1,11 +1,13 @@
+// +build wasm
+
 package canvas
 
 import (
-	"github.com/gopherjs/gopherjs/js"
+	"syscall/js"
 )
 
-func getFloats(obj *js.Object) (ret []float64) {
-	if (obj == js.Undefined) || (obj == nil) || (obj.Length() == 0) {
+func getFloats(obj js.Value) (ret []float64) {
+	if (obj == js.Undefined()) || (obj == js.Null()) || (obj.Length() == 0) {
 		return nil
 	}
 

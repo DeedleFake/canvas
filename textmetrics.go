@@ -1,11 +1,13 @@
+// +build wasm
+
 package canvas
 
 import (
-	"github.com/gopherjs/gopherjs/js"
+	"syscall/js"
 )
 
 type TextMetrics struct {
-	tm *js.Object
+	tm js.Value
 }
 
 func (tm TextMetrics) Width() float64 {
